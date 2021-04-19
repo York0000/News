@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load cropping %}
+
+{% block title %}News{% endblock %}
+
+{% block content %}
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Page Count</th>
+            <th>Description</th>
+            <th>Cover</th>
+            <th>Author</th>
+            <th>Category</th>
+            <th>Created date</th>
+            <th>Updated date</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for news in object_list %}
+            <tr>
+                <td>{{ news.title }}</td>
+                <td>{{ news.page_count | default:'-' }}</td>
+                <td>
+                    <img style="min-height: 100px; min-width: 100px;" class="img-fluid" src="{% cropped_thumbnail news "cropping" scale=0.3 %}">
+                </td>
+                <td>{{ news.description|safe }}</td>
+                <td>{{ news.author.name }}</td>
+                <td>{{ news.category.title }}</td>
+                <td>{{ news.created_at|date:'d.m.Y H:i' }}</td>
+                <td>{{ news.updated_at|date:'d.m.Y H:i' }}</td>
+                <td class="text-center">
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="{% url 'news:update' pk=news.pk %}"></a>
+                                <i class="fa fa-pen text-warning"></i>
+                            </a>
+                        </div>
+                        <div class="col-6 px-0">
+                            <form onsubmit="return confirm('You sure?')" method="POST" action="{% url 'news:delete' pk=news.pk %}">
+                                {% csrf_token %}
+                                <button class="submit-icon" type="submit">
+                                    <i class="fa fa-trash text-danger"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
